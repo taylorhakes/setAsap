@@ -1,4 +1,6 @@
-var asap = (function() {
+(function(global, undefined) {
+	'use strict';
+	var asap = (function() {
 		var callbacks = [], timeout, hiddenDiv, scriptEl, timeoutFn;
 		if(global.MutationObserver) {
 			hiddenDiv = document.createElement("div");
@@ -30,7 +32,7 @@ var asap = (function() {
 				callbacks.push(callback);
 				if(!timeout) {
 					timeout = timeoutFn(function() {
-					  timeout = void 0;
+					  timeout = undefined;
 					  executeCallbacks();
 					}, 0);
 				}
@@ -45,3 +47,15 @@ var asap = (function() {
 			}
 		}
 	})();
+	
+	if(typeof module !== 'undefined' && module.exports) {
+		module.exports = asap;
+	} else if (typeof require !== 'undefined' && require.amd) {
+		define(function() {
+			return asap;
+		});
+	} else {
+		global.asap = asap;
+	}
+	
+})(this, void 0);
