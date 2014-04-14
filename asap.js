@@ -2,6 +2,7 @@
 	'use strict';
 	var asap = (function() {
 		var callbacks = [], timeout, hiddenDiv, scriptEl, timeoutFn;
+		// Modern browsers, fastest async
 		if(global.MutationObserver) {
 			hiddenDiv = document.createElement("div");
 			(new MutationObserver(executeCallbacks)).observe(hiddenDiv, { attributes: true });
@@ -11,6 +12,7 @@
 				}
 				callbacks.push(callback);
 			};
+		// IE browsers without setImmediate
 		} else if(!global.setImmediate && global.document && document.onreadystatechange === null) {
 			return function(callback) {
 				callbacks.push(callback);
@@ -25,7 +27,7 @@
 					document.body.appendChild(scriptEl);
 				}		
 			}
-		
+		// All other browsers and node
 		} else  {
 			timeoutFn = global.setImmediate || setTimeout;
 			return function (callback){
