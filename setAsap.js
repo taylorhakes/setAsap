@@ -34,7 +34,7 @@
 				}
 			};
 		// IE browsers without postMessage
-		} else if (!global.setImmediate && global.document && document.onreadystatechange === null) {
+		} else if (!global.setImmediate && global.document && 'onreadystatechange' in document.createElement('script')) {
 			return function (callback) {
 				callbacks.push(callback);
 				if (!scriptEl) {
