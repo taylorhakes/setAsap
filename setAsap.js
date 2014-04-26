@@ -12,7 +12,7 @@
 				}
 				callbacks.push(callback);
 			};
-			// Browsers that support postMessage
+		// Browsers that support postMessage
 		} else if (!global.setImmediate && global.postMessage && !global.importScripts && global.addEventListener) {
 			var MESSAGE_PREFIX = "com.setImmediate" + Math.random(), hasPostMessage = false;
 
@@ -33,7 +33,7 @@
 					global.postMessage(MESSAGE_PREFIX, "*");
 				}
 			};
-			// IE browsers without postMessage
+		// IE browsers without postMessage
 		} else if (!global.setImmediate && global.document && document.onreadystatechange === null) {
 			return function (callback) {
 				callbacks.push(callback);
@@ -48,7 +48,7 @@
 					document.body.appendChild(scriptEl);
 				}
 			};
-			// All other browsers and node
+		// All other browsers and node
 		} else {
 			timeoutFn = global.setImmediate || (global.process && global.process.nextTick) || setTimeout;
 			return function (callback) {
