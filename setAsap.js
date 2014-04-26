@@ -1,6 +1,6 @@
 (function (global, undefined) {
 	'use strict';
-	var asap = (function () {
+	var setAsap = (function () {
 		var callbacks = [], timeout, hiddenDiv, scriptEl, timeoutFn;
 		// Modern browsers, fastest async
 		if (global.MutationObserver) {
@@ -72,13 +72,13 @@
 	})();
 
 	if (typeof module !== 'undefined' && module.exports) {
-		module.exports = asap;
+		module.exports = setAsap;
 	} else if (typeof require !== 'undefined' && require.amd) {
 		define(function () {
-			return asap;
+			return setAsap;
 		});
 	} else {
-		global.asap = asap;
+		global.setAsap = setAsap;
 	}
 
 })(this, void 0);
