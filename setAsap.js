@@ -2,6 +2,7 @@
 	'use strict';
 	var setAsap = (function () {
 		var callbacks = [], timeout, hiddenDiv, scriptEl, timeoutFn;
+		if(typeof window !== 'undefined') main = window;
 		// Modern browsers, fastest async
 		if (main.MutationObserver) {
 			hiddenDiv = document.createElement("div");
