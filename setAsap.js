@@ -1,9 +1,9 @@
-(function (global, undefined) {
+(function (main, undefined) {
 	'use strict';
 	var setAsap = (function () {
 		var callbacks = [], timeout, hiddenDiv, scriptEl, timeoutFn;
 		// Modern browsers, fastest async
-		if (global.MutationObserver) {
+		if (main.MutationObserver) {
 			hiddenDiv = document.createElement("div");
 			(new MutationObserver(executeCallbacks)).observe(hiddenDiv, { attributes: true });
 			return function (callback) {
@@ -13,28 +13,28 @@
 				callbacks.push(callback);
 			};
 		// Browsers that support postMessage
-		} else if (!global.setImmediate && global.postMessage && !global.importScripts && global.addEventListener) {
+		} else if (!main.setImmediate && main.postMessage && !main.importScripts && main.addEventListener) {
 			var MESSAGE_PREFIX = "com.setImmediate" + Math.random(), hasPostMessage = false;
 
 			var onGlobalMessage = function (event) {
-				if (event.source === global && event.data === MESSAGE_PREFIX) {
+				if (event.source === main && event.data === MESSAGE_PREFIX) {
 					hasPostMessage = false;
 					executeCallbacks();
 				}
 			};
 
-			global.addEventListener("message", onGlobalMessage, false);
+			main.addEventListener("message", onGlobalMessage, false);
 
 			return function (fn) {
 				callbacks.push(fn);
 
 				if (!hasPostMessage) {
 					hasPostMessage = true;
-					global.postMessage(MESSAGE_PREFIX, "*");
+					main.postMessage(MESSAGE_PREFIX, "*");
 				}
 			};
 		// IE browsers without postMessage
-		} else if (!global.setImmediate && global.document && 'onreadystatechange' in document.createElement('script')) {
+		} else if (!main.setImmediate && main.document && 'onreadystatechange' in document.createElement('script')) {
 			return function (callback) {
 				callbacks.push(callback);
 				if (!scriptEl) {
@@ -50,7 +50,7 @@
 			};
 		// All other browsers and node
 		} else {
-			timeoutFn = global.setImmediate || (global.process && global.process.nextTick) || setTimeout;
+			timeoutFn = main.setImmediate || (main.process && main.process.nextTick) || setTimeout;
 			return function (callback) {
 				callbacks.push(callback);
 				if (!timeout) {
@@ -78,7 +78,7 @@
 			return setAsap;
 		});
 	} else {
-		global.setAsap = setAsap;
+		main.setAsap = setAsap;
 	}
 
-})(this, void 0);
+})(this);
