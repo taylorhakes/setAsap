@@ -1,6 +1,6 @@
 {
   "name": "setasap",
-  "version": "0.6.1",
+  "version": "0.7.1",
   "description": "setImmediate polyfill for the browser and node",
   "main": "setAsap.js",
   "scripts": {
