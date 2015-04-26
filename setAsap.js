@@ -49,7 +49,7 @@
 
 		function getAsap(fn) {
 			return function (callback) {
-				if (!callback.length) {
+				if (!callbacks.length) {
 					fn();
 				}
 				callbacks.push(callback);
