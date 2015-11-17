@@ -60,9 +60,20 @@
 			var cbList = callbacks;
 			callbacks = [];
 			for (var i = 0, len = cbList.length; i < len; i++) {
-				cbList[i]();
+				tryError(cbList[i]);
 			}
 		}
+
+		function tryError(fn) {
+			try {
+				fn();
+			} catch(e) {
+				setTimeout(function() {
+					throw e;
+				});
+			}
+		}
+
 	})();
 
 	if (typeof module !== 'undefined' && module.exports) {

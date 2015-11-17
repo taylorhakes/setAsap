@@ -43,6 +43,20 @@
 			});
 			async1 = true;
 		});
+		it('Calls with errors all execute', function(done) {
+			var async1 = false;
+			setAsap(function() {
+				throw new Error();
+			});
+			setAsap(function() {
+				throw new Error();
+			});
+			setAsap(function() {
+				assert.equal(async1, true);
+				done();
+			});
+			async1 = true;
+		});
 	});
 })(this);
 
