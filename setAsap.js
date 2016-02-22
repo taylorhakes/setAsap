@@ -1,8 +1,14 @@
-(function (main, undefined) {
+(function (thisVar, undefined) {
 	'use strict';
+	var main = (typeof window === 'object' && window) || (typeof global === 'object' && global) ||
+		typeof self === 'object' && self || thisVar;
+
+	var hasSetImmediate = typeof setImmediate === 'function';
+	var hasNextTick = typeof process === 'object' && !!process && typeof process.nextTick === 'function';
+
 	var setAsap = (function () {
-		var callbacks = [], timeout, hiddenDiv, scriptEl, timeoutFn;
-		if (typeof window !== 'undefined') main = window;
+		var callbacks = [], hiddenDiv, scriptEl, timeoutFn;
+
 		// Modern browsers, fastest async
 		if (main.MutationObserver) {
 			hiddenDiv = document.createElement("div");
@@ -10,8 +16,9 @@
 			return getAsap(function () {
 				hiddenDiv.setAttribute('yes', 'no');
 			});
-			// Browsers that support postMessage
-		} else if (!main.setImmediate && main.postMessage && !main.importScripts && main.addEventListener) {
+
+		// Browsers that support postMessage
+		} else if (!hasSetImmediate && main.postMessage && !main.importScripts && main.addEventListener) {
 			var MESSAGE_PREFIX = "com.setImmediate" + Math.random(), hasPostMessage = false;
 
 			var onGlobalMessage = function (event) {
@@ -25,8 +32,9 @@
 			return getAsap(function () {
 				main.postMessage(MESSAGE_PREFIX, "*");
 			});
+
 			// IE browsers without postMessage
-		} else if (!main.setImmediate && main.document && 'onreadystatechange' in document.createElement('script')) {
+		} else if (!hasSetImmediate && main.document && 'onreadystatechange' in document.createElement('script')) {
 			return getAsap(function () {
 				scriptEl = document.createElement("script");
 				scriptEl.onreadystatechange = function () {
@@ -37,9 +45,10 @@
 				};
 				document.body.appendChild(scriptEl);
 			});
-			// All other browsers and node
+
+		// All other browsers and node
 		} else {
-			timeoutFn = main.setImmediate || (main.process && main.process.nextTick) || setTimeout;
+			timeoutFn = (hasSetImmediate && setImmediate) || (hasNextTick && process.nextTick) || setTimeout;
 			return getAsap(function () {
 				timeoutFn(function () {
 					executeCallbacks();
