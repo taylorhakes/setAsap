@@ -5,82 +5,72 @@
 
 	var hasSetImmediate = typeof setImmediate === 'function';
 	var hasNextTick = typeof process === 'object' && !!process && typeof process.nextTick === 'function';
+	var index = 0;
+
+	function getNewIndex() {
+		if (index === 9007199254740991) {
+			return 0;
+		}
+		return ++index;
+	}
 
 	var setAsap = (function () {
-		var callbacks = [], hiddenDiv, scriptEl, timeoutFn;
+		var hiddenDiv, scriptEl, timeoutFn, callbacks;
 
 		// Modern browsers, fastest async
 		if (main.MutationObserver) {
-			hiddenDiv = document.createElement("div");
-			(new MutationObserver(executeCallbacks)).observe(hiddenDiv, { attributes: true });
-			return getAsap(function () {
-				hiddenDiv.setAttribute('yes', 'no');
-			});
+			return function setAsap(callback) {
+				hiddenDiv = document.createElement("div");
+				(new MutationObserver(function() {
+					callback();
+					hiddenDiv = null;
+				})).observe(hiddenDiv, { attributes: true });
+				hiddenDiv.setAttribute('i', '1');
+			};
 
 		// Browsers that support postMessage
 		} else if (!hasSetImmediate && main.postMessage && !main.importScripts && main.addEventListener) {
-			var MESSAGE_PREFIX = "com.setImmediate" + Math.random(), hasPostMessage = false;
+
+			var MESSAGE_PREFIX = "com.setImmediate" + Math.random();
+			callbacks = {};
 
 			var onGlobalMessage = function (event) {
-				if (event.source === main && event.data === MESSAGE_PREFIX) {
-					executeCallbacks();
+				if (event.source === main && event.data.indexOf(MESSAGE_PREFIX) === 0) {
+					var i = event.data.split(':')[1];
+					callbacks[i]();
+					delete callbacks[i];
 				}
 			};
 
 			main.addEventListener("message", onGlobalMessage, false);
 
-			return getAsap(function () {
-				main.postMessage(MESSAGE_PREFIX, "*");
-			});
+			return function setAsap(callback) {
+				var i = getNewIndex();
+				callbacks[i] = callback;
+				main.postMessage(MESSAGE_PREFIX + ':' + i, "*");
+			};
 
 			// IE browsers without postMessage
 		} else if (!hasSetImmediate && main.document && 'onreadystatechange' in document.createElement('script')) {
-			return getAsap(function () {
+
+			return function setAsap(callback) {
 				scriptEl = document.createElement("script");
-				scriptEl.onreadystatechange = function () {
+				scriptEl.onreadystatechange = function onreadystatechange() {
 					scriptEl.onreadystatechange = null;
 					scriptEl.parentNode.removeChild(scriptEl);
 					scriptEl = null;
-					executeCallbacks();
+					callback();
 				};
 				document.body.appendChild(scriptEl);
-			});
+			};
 
 		// All other browsers and node
 		} else {
+
 			timeoutFn = (hasSetImmediate && setImmediate) || (hasNextTick && process.nextTick) || setTimeout;
-			return getAsap(function () {
-				timeoutFn(function () {
-					executeCallbacks();
-				}, 0);
-			});
-		}
-
-		function getAsap(fn) {
-			return function (callback) {
-				if (!callbacks.length) {
-					fn();
-				}
-				callbacks.push(callback);
-			}
-		}
-
-		function executeCallbacks() {
-			var cbList = callbacks;
-			callbacks = [];
-			for (var i = 0, len = cbList.length; i < len; i++) {
-				tryError(cbList[i]);
-			}
-		}
-
-		function tryError(fn) {
-			try {
-				fn();
-			} catch(e) {
-				setTimeout(function() {
-					throw e;
-				});
-			}
+			return function setAsap(callback) {
+				timeoutFn(callback);
+			};
 		}
 
 	})();

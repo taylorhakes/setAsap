@@ -2,56 +2,32 @@
 // Generated on Sat Apr 26 2014 12:38:28 GMT-0400 (EDT)
 
 module.exports = function (config) {
-	var customLaunchers = {
-		sl_chrome: {
-			base: 'SauceLabs',
-			browserName: 'chrome'
-		},
-		sl_firefox: {
-			base: 'SauceLabs',
-			browserName: 'firefox'
-		},
-		iphone_4: {
-			base: 'SauceLabs',
-			platform: 'OS X 10.6',
-			browserName: 'iphone',
-			version: '4'
-		},
-		sl_opera: {
-			base: 'SauceLabs',
-			browserName: 'opera'
-		},
-		sl_ie_9: {
-			base: 'SauceLabs',
-			browserName: 'internet explorer',
-			platform: 'Windows 7',
-			version: '9'
-		}
-	};
+
 	config.set({
 
 		// base path that will be used to resolve all patterns (eg. files, exclude)
 		basePath: '',
 
-		// frameworks to use
-		// available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-		frameworks: ['browserify','mocha'],
+		frameworks: ['browserify', 'painless'],
+
 
 		// list of files / patterns to load in the browser
 		files: [
-			'test/*'
+			'test.js'
 		],
+
+
+		// preprocess matching files before serving them to the browser
+		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+		preprocessors: {
+			'test.js': [ 'browserify' ]
+		},
+
 
 		// list of files to exclude
 		exclude: [
 
 		],
-
-		// preprocess matching files before serving them to the browser
-		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-		preprocessors: {
-			'test/*': [ 'browserify' ]
-		},
 
 		// test results reporter to use
 		// possible values: 'dots', 'progress'
@@ -74,12 +50,6 @@ module.exports = function (config) {
 		// start these browsers
 		// available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
 		browsers: ['PhantomJS']/*Object.keys(customLaunchers)*/,
-
-		customLaunchers: customLaunchers,
-
-		sauceLabs: {
-			testName: 'setAsap unit tests'
-		},
 
 		// Continuous Integration mode
 		// if true, Karma captures browsers, runs the tests and exits
