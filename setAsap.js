@@ -36,7 +36,7 @@
 
 			var onGlobalMessage = function (event) {
 				if (event.source === main && event.data.indexOf(MESSAGE_PREFIX) === 0) {
-					var i = event.data.split(':')[1];
+					var i = +event.data.split(':')[1];
 					callbacks[i]();
 					delete callbacks[i];
 				}
